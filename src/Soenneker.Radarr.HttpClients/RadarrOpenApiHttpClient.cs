@@ -11,11 +11,11 @@ using Soenneker.Utils.HttpClientCache.Abstract;
 
 namespace Soenneker.Radarr.HttpClients;
 
-///<inheritdoc cref="IRadarrOpenApiHttpClient"/>
 public sealed class RadarrOpenApiHttpClient : IRadarrOpenApiHttpClient
 {
     private readonly IHttpClientCache _httpClientCache;
     private readonly IConfiguration _config;
+    private readonly string _cacheKey = $"{nameof(RadarrOpenApiHttpClient)}:{Guid.NewGuid():N}";
 
     private const string _prodBaseUrl = "http://localhost:7878";
 
@@ -27,7 +27,7 @@ public sealed class RadarrOpenApiHttpClient : IRadarrOpenApiHttpClient
 
     public ValueTask<HttpClient> Get(CancellationToken cancellationToken = default)
     {
-        return _httpClientCache.Get(nameof(RadarrOpenApiHttpClient), (config: _config, baseUrl: _config["Radarr:ClientBaseUrl"] ?? _prodBaseUrl), static state =>
+        return _httpClientCache.Get(_cacheKey, (config: _config, baseUrl: _config["Radarr:ClientBaseUrl"] ?? _prodBaseUrl), static state =>
         {
             var apiKey = state.config.GetValueStrict<string>("Radarr:ApiKey");
             string authHeaderName = state.config["Radarr:AuthHeaderName"] ?? "X-Api-Key";
@@ -45,20 +45,13 @@ public sealed class RadarrOpenApiHttpClient : IRadarrOpenApiHttpClient
         }, cancellationToken);
     }
 
-    /// <summary>
-    /// Releases resources used by the current instance.
-    /// </summary>
     public void Dispose()
     {
-        _httpClientCache.RemoveSync(nameof(RadarrOpenApiHttpClient));
+        _httpClientCache.RemoveSync(_cacheKey);
     }
 
-    /// <summary>
-    /// Asynchronously releases resources used by the current instance.
-    /// </summary>
-    /// <returns>A task that represents the asynchronous operation.</returns>
     public ValueTask DisposeAsync()
     {
-        return _httpClientCache.Remove(nameof(RadarrOpenApiHttpClient));
+        return _httpClientCache.Remove(_cacheKey);
     }
 }
