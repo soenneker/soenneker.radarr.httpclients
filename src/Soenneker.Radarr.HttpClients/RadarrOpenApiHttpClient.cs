@@ -11,6 +11,7 @@ using Soenneker.Utils.HttpClientCache.Abstract;
 
 namespace Soenneker.Radarr.HttpClients;
 
+/// <inheritdoc cref="IRadarrOpenApiHttpClient" />
 public sealed class RadarrOpenApiHttpClient : IRadarrOpenApiHttpClient
 {
     private readonly IHttpClientCache _httpClientCache;
