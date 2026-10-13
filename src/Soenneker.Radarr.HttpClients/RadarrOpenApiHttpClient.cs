@@ -30,7 +30,7 @@ public sealed class RadarrOpenApiHttpClient : IRadarrOpenApiHttpClient
     {
         return _httpClientCache.Get(_cacheKey, (config: _config, baseUrl: _config["Radarr:ClientBaseUrl"] ?? _prodBaseUrl), static state =>
         {
-            var apiKey = state.config.GetValueStrict<string>("Radarr:ApiKey");
+            var apiKey = state.config.GetStringStrict("Radarr:ApiKey");
             string authHeaderName = state.config["Radarr:AuthHeaderName"] ?? "X-Api-Key";
             string authHeaderValueTemplate = state.config["Radarr:AuthHeaderValueTemplate"] ?? "{token}";
             string authHeaderValue = authHeaderValueTemplate.Replace("{token}", apiKey, StringComparison.Ordinal);
